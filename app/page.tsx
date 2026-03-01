@@ -43,7 +43,14 @@ function getTimeLeft(target: Date) {
 }
 
 export default function Home() {
-  const [timeLeft, setTimeLeft] = useState(() => getTimeLeft(EVENT_DATE));
+  const [timeLeft, setTimeLeft] = useState(() => ({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+    isLive: false,
+  }));
+  const [isMounted, setIsMounted] = useState(false);
   const [status, setStatus] = useState<Status>("idle");
   const [form, setForm] = useState<FormState>({
     name: "",
@@ -52,6 +59,8 @@ export default function Home() {
   });
 
   useEffect(() => {
+    setIsMounted(true);
+    setTimeLeft(getTimeLeft(EVENT_DATE));
     const interval = setInterval(() => {
       setTimeLeft(getTimeLeft(EVENT_DATE));
     }, 1000);
@@ -67,20 +76,25 @@ export default function Home() {
     if (status === "loading") return;
     setStatus("loading");
 
-    // TODO: Paste your Google Apps Script Webhook URL here.
-    const webhookUrl = "PASTE_WEBHOOK_URL_HERE";
+    // TODO: Paste your Google Apps Script Webhook URL here (must end with /exec).
+    const webhookUrl =
+      "https://script.google.com/macros/s/AKfycbx5SKBR3wDr9V0HI37sluzr4ZOpk5pZ9H6tVKeRbHej5PxnN22xNzS_Mry97AjTsizu/exec";
 
     try {
-      await fetch(webhookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        // If your Apps Script expects form-encoded data or needs no-cors, adjust here.
-        body: JSON.stringify({
-          ...form,
-          event: "Арсен",
-          eventDate: "23 наурыз 2026",
-        }),
-      });
+      fetch(webhookUrl, {
+  method: "POST",
+  mode: "no-cors",
+  headers: {
+    "Content-Type": "text/plain;charset=utf-8",
+  },
+  body: JSON.stringify({
+    name: "Арсен",
+    guests: 50,
+    phone: "+7 700 123 45 67",
+    event: "Той",
+    eventDate: "23.03.2026"
+  })
+});
 
       setStatus("success");
       setForm({ name: "", guests: "1", phone: "" });
@@ -283,7 +297,7 @@ export default function Home() {
                     className="rounded-2xl border border-[#e6d6b4] bg-[#fffaf0] px-3 py-4"
                   >
                     <div className="text-2xl font-semibold text-[#b88b3c] sm:text-3xl">
-                      {item.value.toString().padStart(2, "0")}
+                      {isMounted ? item.value.toString().padStart(2, "0") : "00"}
                     </div>
                     <div className="mt-1 text-[10px] uppercase tracking-[0.3em] text-[#9c7530]">
                       {item.label}
@@ -414,7 +428,7 @@ export default function Home() {
 
                 {status === "error" && (
                   <p className="text-sm text-[#b45644]">
-                    Жіберу сәтсіз болды. Байланыс пен webhook-ты тексеріңіз.
+                    Жіберу сәтсіз болды. Webhook URL, жариялау рұқсаты және интернетті тексеріңіз.
                   </p>
                 )}
 
