@@ -81,20 +81,18 @@ export default function Home() {
       "https://script.google.com/macros/s/AKfycbx5SKBR3wDr9V0HI37sluzr4ZOpk5pZ9H6tVKeRbHej5PxnN22xNzS_Mry97AjTsizu/exec";
 
     try {
-      fetch(webhookUrl, {
-  method: "POST",
-  mode: "no-cors",
-  headers: {
-    "Content-Type": "text/plain;charset=utf-8",
-  },
-  body: JSON.stringify({
-    name: "Арсен",
-    guests: 50,
-    phone: "+7 700 123 45 67",
-    event: "Той",
-    eventDate: "23.03.2026"
-  })
-});
+      await fetch(webhookUrl, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8",
+        },
+        body: JSON.stringify({
+          name: form.name,
+          guests: form.guests,
+          phone: form.phone,
+        }),
+      });
 
       setStatus("success");
       setForm({ name: "", guests: "1", phone: "" });
